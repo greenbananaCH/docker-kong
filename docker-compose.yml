@@ -1,0 +1,53 @@
+version: '2'
+services:
+
+  #######################################
+  # Kong
+  #######################################
+
+  kong-database:
+    image: postgres:9.4
+    ports:
+      - 5432
+    environment:
+      - POSTGRES_USER=kong
+      - POSTGRES_DB=kong
+    networks:
+     - nginx-proxy
+
+  kong:
+    image: kong
+    restart: always
+    links:
+      - kong-database:kong-database
+    ports:
+      - 8000
+      - 8001
+    expose:
+      - 7946
+      - 7946/udp
+    environment:
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=kong-database
+      - VIRTUAL_HOST=api.agrano-dev.ch
+      - VIRTUAL_PORT=8000
+    networks:
+     - nginx-proxy
+
+  # User: langhard
+  # Password: Y1438!1S5J6M^Auot5kM
+
+  kong-admin:
+    image: pantsel/konga
+    links:
+      - kong
+    environment:
+      - VIRTUAL_HOST=api-manager.agrano-dev.ch
+      - VIRTUAL_PORT=1338
+    networks:
+     - nginx-proxy
+
+networks:
+  nginx-proxy:
+    external:
+      name: nginx-proxy

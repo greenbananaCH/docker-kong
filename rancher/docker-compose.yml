@@ -1,0 +1,30 @@
+version: '2'
+services:
+  kong-database:
+    image: postgres:9.4
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_DB: kong
+    stdin_open: true
+    tty: true
+    labels:
+      io.rancher.container.pull_image: always
+  kong-admin:
+    image: pantsel/konga
+    stdin_open: true
+    tty: true
+    links:
+    - kong:kong
+    labels:
+      io.rancher.container.pull_image: always
+  kong:
+    image: kong
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+    stdin_open: true
+    tty: true
+    links:
+    - kong-database:kong-database
+    labels:
+      io.rancher.container.pull_image: always
