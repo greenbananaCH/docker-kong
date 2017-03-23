@@ -23,6 +23,8 @@ services:
       KONG_DATABASE: postgres
       KONG_PG_HOST: kong-database
     stdin_open: true
+    external_links:
+    - API-Product/api:api-product
     tty: true
     links:
     - kong-database:kong-database
