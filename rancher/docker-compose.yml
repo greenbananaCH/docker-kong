@@ -1,5 +1,11 @@
 version: '2'
 services:
+  kong-admin-db:
+    image: mongo
+    stdin_open: true
+    tty: true
+    labels:
+      io.rancher.container.pull_image: always
   kong-database:
     image: postgres:9.4
     environment:
@@ -9,23 +15,16 @@ services:
     tty: true
     labels:
       io.rancher.container.pull_image: always
-  kong-admin-db:
-    image: mongo:latest
-    stdin_open: true
-    tty: true
-    links:
-    - kong:kong
-    labels:
-      io.rancher.container.pull_image: always
   kong-admin:
     image: pantsel/konga
     environment:
-      DB_ADAPTER: mongo
       DB_HOST: kong-admin-db
+      DB_ADAPTER: mongo
     stdin_open: true
     tty: true
     links:
     - kong:kong
+    - kong-admin-db:kong-admin-db
     labels:
       io.rancher.container.pull_image: always
   kong:
@@ -36,6 +35,8 @@ services:
     stdin_open: true
     external_links:
     - API-Product/api:api-product
+    - API-Documentation/swagger-ui:api-documentation
+    - API-File/api:api-file
     tty: true
     links:
     - kong-database:kong-database
