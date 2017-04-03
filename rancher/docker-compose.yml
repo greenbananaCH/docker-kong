@@ -9,8 +9,19 @@ services:
     tty: true
     labels:
       io.rancher.container.pull_image: always
+  kong-admin-db:
+    image: mongo:latest
+    stdin_open: true
+    tty: true
+    links:
+    - kong:kong
+    labels:
+      io.rancher.container.pull_image: always
   kong-admin:
     image: pantsel/konga
+    environment:
+      DB_ADAPTER: mongo
+      DB_HOST: kong-admin-db
     stdin_open: true
     tty: true
     links:
